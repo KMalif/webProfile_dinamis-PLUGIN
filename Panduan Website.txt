@@ -1,0 +1,8 @@
+Panduan Website
+##nama database yang digunakan "tmhs" file tmhs.sql disertakan di dalam folder 
+##halaman website client side ada di file index.php
+##halaman website admin/server side ada di file admin.php
+##login menggunakan username "admin" password "admin" sebelum masuk ke halaman admin
+##Hapus cookie untuk mengecek adanya session di halaman login dan admin
+##Untuk menjalankan fungsi CRUD dan upload file ada di halaman admin dan hasilnya dapat dilihat di halaman index.php
+ 

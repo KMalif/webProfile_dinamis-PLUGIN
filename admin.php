@@ -1,43 +1,13 @@
 <?php
-	//Koneksi Database
-	$server = "localhost";
-	$user = "root";
-	$pass = "";
-	$database = "tmhs";
-
-	$koneksi = mysqli_connect($server, $user, $pass, $database)or die(mysqli_error($koneksi));
-
+session_start();
+if(!isset($_SESSION["login"])){
+	header("location: login.php");
+	exit;
+}
+	include 'koneksi.php';
 	//jika tombol simpan diklik
 	if(isset($_POST['bsimpan']))
-	{
-		//Pengujian Apakah data akan diedit atau disimpan baru
-		if($_GET['hal'] == "edit")
-		{
-			//Data akan di edit
-			$edit = mysqli_query($koneksi, "UPDATE tmhs set
-											 	nim = '$_POST[tnim]',
-											 	nama = '$_POST[tnama]',
-												alamat = '$_POST[talamat]',
-											 	prodi = '$_POST[tprodi]'
-											 WHERE id_mhs = '$_GET[id]'
-										   ");
-			if($edit) //jika edit sukses
-			{
-				echo "<script>
-						alert('Edit data suksess!');
-						document.location='admin.php';
-				     </script>";
-			}
-			else
-			{
-				echo "<script>
-						alert('Edit data GAGAL!!');
-						document.location='admin.php';
-				     </script>";
-			}
-		}
-		else
-		{
+	{	
 			//Data akan disimpan Baru
 			$simpan = mysqli_query($koneksi, "INSERT INTO tmhs (nim, nama, alamat, prodi)
 										  VALUES ('$_POST[tnim]', 
@@ -58,11 +28,8 @@
 						alert('Simpan data GAGAL!!');
 						document.location='admin.php';
 				     </script>";
-			}
-		}
-
-
-		
+			
+		}	
 	}
 
 
@@ -102,74 +69,86 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>CRUD UAS</title>
+	<title>Input Data Anggota</title>
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 </head>
 <body>
 <div class="container">
 
-	<h1 class="text-center">Data Mahasiswa</h1>
+	<h1 class="text-center">Data Anggota PLUGIN</h1>
 	<h2 class="text-center"></h2>
 
 	<!-- Awal Card Form -->
 	<div class="card mt-3">
-	  <div class="card-header bg-primary text-white">
-	    Form Input Data Mahasiswa
+	  <div class="card-header bg-dark text-center text-white">
+	    Form Input Data Anggota PLUGIN
 	  </div>
 	  <div class="card-body">
 	    <form method="post" action="">
 	    	<div class="form-group">
-	    		<label>Nim</label>
-	    		<input type="text" name="tnim" value="<?=@$vnim?>" class="form-control" placeholder="Input Nim anda disini!" required>
+	    		<label>No Anggota</label>
+				<input type="text" name="tnim" value="<?=@$vnim?>" class="form-control" 
+				placeholder="Input no anggota disini!" required>
 	    	</div>
 	    	<div class="form-group">
 	    		<label>Nama</label>
-	    		<input type="text" name="tnama" value="<?=@$vnama?>" class="form-control" placeholder="Input Nama anda disini!" required>
+				<input type="text" name="tnama" value="<?=@$vnama?>" class="form-control" 
+				placeholder="Input Nama disini!" required>
 	    	</div>
 	    	<div class="form-group">
 	    		<label>Alamat</label>
-	    		<textarea class="form-control" name="talamat"  placeholder="Input Alamat anda disini!"><?=@$valamat?></textarea>
+				<textarea class="form-control" name="talamat" 
+				 placeholder="Input Alamat disini!"><?=@$valamat?></textarea>
 	    	</div>
 	    	<div class="form-group">
-	    		<label>Program Studi</label>
+	    		<label>Squad</label>
 	    		<select class="form-control" name="tprodi">
 	    			<option value="<?=@$vprodi?>"><?=@$vprodi?></option>
-	    			<option value="D3-MI">D3-MI</option>
-	    			<option value="S1-SI">S1-SI</option>
-	    			<option value="S1-TI">S1-TI</option>
+	    			<option value="Mobile Squad">Squad Mobile</option>
+	    			<option value="Website Squad">Squad Website</option>
+	    			<option value="Network Squad">Squad Network</option>
 	    		</select>
 	    	</div>
-
 	    	<button type="submit" class="btn btn-success" name="bsimpan">Simpan</button>
 	    	<button type="reset" class="btn btn-danger" name="breset">Kosongkan</button>
-
 	    </form>
 	  </div>
 	</div>
 	<!-- Akhir Card Form -->
 
-	<!-- Awal Card Tabel -->
+	<!-- upload gambar -->
+	
 	<div class="card mt-3">
-	  <div class="card-header bg-success text-white">
-	    Daftar Mahasiswa
+	  <div class="card-header bg-dark text-center text-white">
+	    Form Upload gambar
 	  </div>
 	  <div class="card-body">
-	    
+	<form action="upload.php" method="POST" enctype="multipart/form-data">
+  <center>	<input type="file" name="file">
+	<input type="submit" name="upload" value="upload"></center>
+	</form>
+	</div>
+	</div>
+	
+	<!-- end upload gambar -->
+
+	<!-- Awal Card Tabel -->
+	<div class="card mt-3">
+	  <div class="card-header bg-dark text-white">Preview</div>
+	  <div class="card-body">
 	    <table class="table table-bordered table-striped">
 	    	<tr>
 	    		<th>No.</th>
-	    		<th>Nim</th>
+	    		<th>No Anggota</th>
 	    		<th>Nama</th>
 	    		<th>Alamat</th>
-	    		<th>Program Studi</th>
+	    		<th>Squad</th>
 	    		<th>Aksi</th>
 	    	</tr>
 	    	<?php
 	    		$no = 1;
 	    		$tampil = mysqli_query($koneksi, "SELECT * from tmhs order by id_mhs desc");
-	    		while($data = mysqli_fetch_array($tampil)) :
-
-	    	?>
+	    		while($data = mysqli_fetch_array($tampil)):?>
 	    	<tr>
 	    		<td><?=$no++;?></td>
 	    		<td><?=$data['nim']?></td>
@@ -184,7 +163,6 @@
 	    	</tr>
 	    <?php endwhile; //penutup perulangan while ?>
 	    </table>
-
 	  </div>
 	</div>
 	<!-- Akhir Card Tabel -->
